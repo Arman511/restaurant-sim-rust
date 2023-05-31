@@ -16,7 +16,11 @@ fn main() {
         ans = input_string("++++ RESTAURANT SIMULATOR\nm to show the menu\ng for getting an order\ns for serving an order\na for adding menu item\ni to show ingredients of an item\np to see profits\nc to change the price of a food\nr to remove a food from the menu\nq to quit: ").to_lowercase().chars().next().unwrap();
         match ans {
             'q' => break,
-            'm' => my_restaurant.print_menu(),
+            'm' => {
+                my_restaurant.print_menu();
+                to_continue();
+            }
+            
             'g' => {
                 let (seat_number, food_numbers) = my_restaurant.take_order();
                 ordering.insert(seat_number, food_numbers.clone());
@@ -24,7 +28,9 @@ fn main() {
                     "Order received for seat number {}: {:?}",
                     seat_number, food_numbers
                 );
+                to_continue();
             }
+
             'i' => {
                 my_restaurant.print_menu();
                 let food_number: u8 =
@@ -32,12 +38,14 @@ fn main() {
                         .parse()
                         .unwrap();
                 my_restaurant.show_ingredients(food_number);
+                to_continue();
             }
+
             's' => {
                 let seat_number: u8 = input_string("Enter the seat number to serve: ")
                     .parse()
                     .unwrap();
-                let mut found=false;
+                let mut found = false;
                 for serving_item in ordering.get(&seat_number).unwrap() {
                     profit += my_restaurant.serve(*serving_item, seat_number) * PROFIT_MARGINS;
                     found = true;
@@ -46,7 +54,9 @@ fn main() {
                     println!("No order found for seat number {}", seat_number);
                 }
                 ordering.remove(&seat_number);
+                to_continue();
             }
+
             'a' => {
                 let food_name = input_string("Enter the food name: ");
                 let food_price: f32 = input_string("Enter the food price: ").parse().unwrap();
@@ -58,10 +68,14 @@ fn main() {
                 let new_food = Food::new(food_name, food_price, ingredients);
                 my_restaurant.add_menu_item(new_food);
                 println!("New menu item added successfully!");
+                to_continue();
             }
+
             'p' => {
                 println!("Total profit: £{:.2}", profit);
+                to_continue();
             }
+
             'c' => {
                 my_restaurant.print_menu();
                 let food_number: u8 = input_string("Enter the food number to change its price: ")
@@ -71,14 +85,19 @@ fn main() {
                 my_restaurant.change_food_price(food_number, new_price);
                 println!("Food price updated successfully!");
             }
+
             'r' => {
                 my_restaurant.remove_menu_item();
                 println!("Food item removed successfully!");
             }
 
-            _ => println!("Not a valid input"),
+            _ => {
+                println!("Not a valid input");
+                to_continue();
+            }
         }
     }
+    to_continue();
 }
 
 fn input_string(msg: &str) -> String {
@@ -130,4 +149,9 @@ fn get_restaurant() -> Restaurant {
         owner,
         phone_number,
     )
+}
+
+fn to_continue() {
+    input_string("\nPress enter to continue . . .");
+    println!();
 }
